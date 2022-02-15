@@ -1,7 +1,4 @@
-import React from 'react';
-import MyReact from '../MyReact/MyReact';
-
-const render = function (currentElement, parentElement) {
+const update = function (currentElement, parentElement, isRoot) {
   console.log('cur', currentElement);
   if (
     typeof currentElement === 'string' ||
@@ -16,8 +13,7 @@ const render = function (currentElement, parentElement) {
     const curInstance = new currentElement.type(currentElement.props);
     curInstance.parentDOMele = parentElement;
     const renderElement = curInstance.render();
-    curInstance.preVDOM = renderElement;
-    render(renderElement, parentElement);
+    update(renderElement, parentElement);
     return;
   }
 
@@ -37,24 +33,70 @@ const render = function (currentElement, parentElement) {
       const curchildren = currentElement.props[key];
       if (Array.isArray(curchildren)) {
         curchildren.forEach((element) => {
-          render(element, cur);
+          update(element, cur);
         });
       } else if (typeof curchildren === 'string') {
         const currentTextNode = document.createTextNode(curchildren);
         cur.appendChild(currentTextNode);
       } else {
-        render(curchildren, cur);
+        update(curchildren, cur);
       }
     } else {
       cur.setAttribute(key, currentElement.props[key]);
     }
   });
-
-  parentElement.appendChild(cur);
+  if (isRoot) {
+    parentElement.lastChild.replaceWith(cur);
+  } else {
+    parentElement.appendChild(cur);
+  }
 };
 
-const MyReactDOM = {
-  render,
+class Component {
+  constructor(props) {
+    this.props = props;
+  }
+
+  setState(newState) {
+    setTimeout(() => {
+      this.state = { ...this.state, ...newState };
+      // console.log('nextVDOM', this.render());
+      // console.log('preVDOM', this.preVDOM);
+      update(this.render(), this.parentDOMele, true);
+    }, 0);
+  }
+}
+
+const MyReact = {
+  Component,
 };
 
-export default MyReactDOM;
+export default MyReact;
+
+// let state = {
+//   a: 1,
+//   b: 2,
+// };
+// const preState = state;
+// //state.a = state.a + 1; // mutable
+
+// //const nextState = state;
+
+// // imutable waly
+// const nextState = {
+//   ...preState,
+//   a: preState.a + 1,
+// };
+// console.log('TEST', state);
+
+// console.log(preState === nextState);
+
+// const state = [1, 2, 3];
+
+// const newState = state.map((item) => item * 2);
+
+// state.push(4);
+// const newState3 = state; //mutalbe
+// const temp = [...state];
+// temp.push(4);
+// const newState2 = temp; // imutable

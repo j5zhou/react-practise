@@ -1,24 +1,45 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import MyReactDOM from './MyReact/MyReactDOM';
+import MyReact from './MyReact/MyReact';
 import './index.css';
 // import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-class MyApp extends React.Component {
+window.createElement = React.createElement;
+class MyTitle extends MyReact.Component {
+  render() {
+    return <h1>{this.props.title}</h1>;
+  }
+}
+class MyApp extends MyReact.Component {
+  state = {
+    counter: 0,
+    name: 'patrick',
+  };
+
+  hanldeAdd = () => {
+    console.log(this);
+    this.setState({
+      counter: this.state.counter + 1,
+    });
+    this.setState({
+      counter: this.state.counter + 1,
+    });
+    // this.setState({
+    //   counter: this.state.counter + 1,
+    // });
+    console.log('hello');
+  };
+
   render() {
     return (
-      <section
-        className="my-section"
-        onClick={() => {
-          alert('hello');
-        }}
-        id="id"
-      >
+      <section className="my-section" id="id">
+        <MyTitle title={this.props.title} />
         <h1>
-          <span style={{ color: 'red' }}>Hello</span>
+          <span style={{ color: 'red' }}>Counter : {this.state.counter}</span>
         </h1>
-        <button>Add</button>
+        <button onClick={this.hanldeAdd}>Add</button>
       </section>
     );
   }
@@ -26,7 +47,7 @@ class MyApp extends React.Component {
 
 // MyApp vs <MyApp/>  vs   React.createElement(MyApp, {})
 
-MyReactDOM.render(<MyApp />, document.getElementById('root'));
+MyReactDOM.render(<MyApp title="MyApp5" />, document.getElementById('root'));
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
