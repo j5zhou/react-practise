@@ -6,7 +6,6 @@ import './index.css';
 // import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-window.createElement = React.createElement;
 class MyTitle extends MyReact.Component {
   render() {
     return <h1>{this.props.title}</h1>;
