@@ -18,16 +18,15 @@ class MyApp extends MyReact.Component {
   };
 
   hanldeAdd = () => {
-    console.log(this);
-    this.setState({
-      counter: this.state.counter + 1,
+    // this.setState({ counter: 1 });
+    // this.setState({ counter: 1 });
+
+    this.setState((preState) => {
+      return { counter: preState.counter + 1 };
     });
-    this.setState({
-      counter: this.state.counter + 1,
+    this.setState((preState) => {
+      return { counter: preState.counter + 1 };
     });
-    // this.setState({
-    //   counter: this.state.counter + 1,
-    // });
     console.log('hello');
   };
 

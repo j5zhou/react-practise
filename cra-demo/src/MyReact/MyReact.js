@@ -57,11 +57,19 @@ class Component {
     this.props = props;
   }
 
-  setState(newState) {
+  setState(newStateOrCB) {
     setTimeout(() => {
-      this.state = { ...this.state, ...newState };
-      // console.log('nextVDOM', this.render());
-      // console.log('preVDOM', this.preVDOM);
+      if (typeof newStateOrCB === 'function') {
+        const newState = newStateOrCB(this.state);
+        this.state = { ...this.state, ...newState };
+      } else {
+        this.state = { ...this.state, ...newStateOrCB };
+        // console.log('nextVDOM', this.render());
+        // console.log('preVDOM', this.preVDOM);
+        console.log('STATE', this.state);
+        console.log('newState', newStateOrCB);
+      }
+
       update(this.render(), this.parentDOMele, true);
     }, 0);
   }
