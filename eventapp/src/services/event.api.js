@@ -21,6 +21,14 @@ export const deleteEvent = (id) =>
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-  })
-    .then((response) => response.json())
-    .then((json) => console.log(json));
+  }).then((response) => response.json());
+
+export const editEvent = (editEvent) =>
+  fetch([baseURL, path, editEvent.id].join('/'), {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(editEvent),
+  }).then((response) => response.json());

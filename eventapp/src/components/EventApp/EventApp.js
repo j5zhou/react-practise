@@ -1,11 +1,18 @@
 import React from 'react';
+import './EventApp.css';
 import {
   getAllEvents,
   addNewEvent,
   deleteEvent,
+  editEvent,
 } from '../../services/event.api';
 
 import { EventData } from '../../models/EventData';
+import EventEditRow from '../EventEditRow/EventEditRow';
+import EventRow from '../EventRow/EventRow';
+import EventAddRow from '../EventAddRow/EventAddRow';
+import EventDataRow from '../EventDataRow/EventDataRow';
+import Button from '../Button/Button';
 
 class EventApp extends React.Component {
   state = {
@@ -15,12 +22,21 @@ class EventApp extends React.Component {
     newEvent: new EventData('', '' + Date.now(), '' + Date.now()),
   };
 
+  generateEditEventstate = (event) => {
+    event.isEditing = false;
+    event.editEvent = new EventData(
+      event.eventName,
+      event.startDate,
+      event.endDate,
+      event.id
+    );
+  };
+
   fetchAllEvents = () => {
     getAllEvents().then((data) => {
       const events = data.map(({ eventName, startDate, endDate, id }) => {
         const newEvent = new EventData(eventName, startDate, endDate, id);
-        newEvent.isEditing = false;
-        newEvent.editEvent = new EventData(eventName, startDate, endDate, id);
+        this.generateEditEventstate(newEvent);
         return newEvent;
       });
 
@@ -79,7 +95,8 @@ class EventApp extends React.Component {
       alert('inValid');
     }
   };
-  hanldeEdit = (id) => {
+  hanldeEdit = ({ id }) => {
+    console.log('edit', id);
     this.setState({
       events: this.state.events.map((event) => {
         if (event.id === id) {
@@ -91,7 +108,7 @@ class EventApp extends React.Component {
     });
   };
 
-  hanldeOnChangeEdit = ({ target: { name, value } }, id) => {
+  hanldeOnChangeEdit = ({ target: { name, value } }, { id }) => {
     this.setState({
       events: this.state.events.map((event) => {
         if (event.id === id) {
@@ -114,12 +131,28 @@ class EventApp extends React.Component {
       }),
     });
   };
+  hanldeEditSave = (editEventObj) => {
+    editEvent(editEventObj).then((data) => {
+      this.setState({
+        events: this.state.events.map((event) => {
+          if (event.id === editEventObj.id) {
+            return {
+              ...editEventObj,
+              isEditing: false,
+            };
+          } else {
+            return event;
+          }
+        }),
+      });
+    });
+  };
 
   render() {
     return (
       <section className="event-app">
         <header className="event-app__header">
-          <button onClick={this.hanldeAddEvent}>Add Event</button>
+          <Button onClick={this.hanldeAddEvent}>Add Event</Button>
         </header>
         <table className="event-app__table">
           <thead>
@@ -132,91 +165,55 @@ class EventApp extends React.Component {
           <tbody>
             {this.state.events?.map((event) =>
               event.isEditing ? (
-                <tr key={event.id}>
-                  <td>
-                    <input
-                      type="text"
-                      name="eventName"
-                      value={event.editEvent.eventName}
-                      onChange={(e) => this.hanldeOnChangeEdit(e, event.id)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="date"
-                      name="startDate"
-                      value={event.editEvent.startDate}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="date"
-                      name="endDate"
-                      value={event.editEvent.endDate}
-                    />
-                  </td>
-                  <td>
-                    <button>Save</button>
-                    <button onClick={() => this.hanldeCancel(event.id)}>
-                      Cancel
-                    </button>
-                  </td>
-                </tr>
+                <EventDataRow
+                  key={event.id}
+                  event={event.editEvent}
+                  actions={[
+                    {
+                      actionName: 'Save',
+                      actionFn: this.hanldeEditSave,
+                    },
+                    {
+                      actionName: 'Cancel',
+                      actionFn: this.hanldeCancel,
+                    },
+                  ]}
+                  handleOnchange={this.hanldeOnChangeEdit}
+                ></EventDataRow>
               ) : (
-                <tr key={event.id}>
-                  <td>
-                    <input type="text" disabled value={event.eventName} />
-                  </td>
-                  <td>
-                    <input type="date" disabled value={event.startDate} />
-                  </td>
-                  <td>
-                    <input type="date" disabled value={event.endDate} />
-                  </td>
-                  <td>
-                    <button onClick={() => this.hanldeEdit(event.id)}>
-                      Edit
-                    </button>
-                    <button onClick={() => this.hanldeDelete(event.id)}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
+                <EventDataRow
+                  key={event.id}
+                  event={event}
+                  actions={[
+                    {
+                      actionName: 'Edit',
+                      actionFn: this.hanldeEdit,
+                    },
+                    {
+                      actionName: 'Delete',
+                      actionFn: this.hanldeDelete,
+                    },
+                  ]}
+                ></EventDataRow>
               )
             )}
           </tbody>
           <tfoot>
             {this.state.isShowAddEventRow ? (
-              <tr>
-                <td>
-                  <input
-                    type="text"
-                    name="eventName"
-                    value={this.state.newEvent.eventName}
-                    onChange={this.hanldeOnChange}
-                  />
-                </td>
-                <td>
-                  <input
-                    onChange={this.hanldeOnChange}
-                    type="date"
-                    value={this.state.newEvent.startDate}
-                    name="startDate"
-                  />
-                </td>
-                <td>
-                  <input
-                    onChange={this.hanldeOnChange}
-                    name="endDate"
-                    type="date"
-                    value={this.state.newEvent.endDate}
-                  />
-                </td>
-                <td>
-                  <button onClick={this.hanldeSaveAddNew}>Save</button>
-                  <button onClick={this.handleClose}>Close</button>
-                </td>
-              </tr>
+              <EventDataRow
+                event={this.state.newEvent}
+                actions={[
+                  {
+                    actionName: 'Save',
+                    actionFn: this.hanldeSaveAddNew,
+                  },
+                  {
+                    actionName: 'Close',
+                    actionFn: this.handleClose,
+                  },
+                ]}
+                handleOnchange={this.hanldeOnChange}
+              ></EventDataRow>
             ) : null}
           </tfoot>
         </table>
