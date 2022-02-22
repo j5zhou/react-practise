@@ -1,8 +1,7 @@
 import React from 'react';
 
-class EventTable extends React.Component {
-  render() {
-    const { renderHeader, dataCol, renderFooter } = this.props;
+function EventTable(props){
+    const { renderHeader, dataCol, renderFooter } = props;
 
     const header = renderHeader ? (
       <header className="event-app__header">{renderHeader()}</header>
@@ -21,12 +20,11 @@ class EventTable extends React.Component {
               ))}
             </tr>
           </thead>
-          <tbody>{this.props.children}</tbody>
+          <tbody>{props.children}</tbody>
           {footer}
         </table>
       </section>
     );
   }
-}
 
 export default EventTable;

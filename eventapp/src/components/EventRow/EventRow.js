@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-class EventRow extends React.Component {
-  render() {
-    const { event, hanldeEdit, hanldeDelete } = this.props;
+function EventRow(props){
+    const { event, hanldeEdit, hanldeDelete } = props;
     return (
       <tr key={event.id}>
         <td>
@@ -21,7 +20,6 @@ class EventRow extends React.Component {
         </td>
       </tr>
     );
-  }
 }
 
 EventRow.propTypes = {

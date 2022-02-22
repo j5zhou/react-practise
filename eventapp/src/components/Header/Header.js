@@ -1,13 +1,13 @@
 import React from 'react';
 import './Header.css';
 import EventCounter from '../EventCounter/EventCounter';
-export default class Header extends React.Component {
-  hanldeNavClick = (e, pageInfo) => {
+export default function Header(props){
+
+  const hanldeNavClick = (e, pageInfo) => {
     e.preventDefault();
-    this.props.hanldePageChange(pageInfo);
+    props.hanldePageChange(pageInfo);
   };
-  render() {
-    const { pagesInfo } = this.props;
+    const { pagesInfo } = props;
     return (
       <header className="app-header">
         <nav className="app-header__nav">
@@ -17,7 +17,7 @@ export default class Header extends React.Component {
             <a
               href={key}
               key={key}
-              onClick={(e) => this.hanldeNavClick(e, key)}
+              onClick={(e) => hanldeNavClick(e, key)}
             >
               {key}
             </a>
@@ -26,4 +26,3 @@ export default class Header extends React.Component {
       </header>
     );
   }
-}

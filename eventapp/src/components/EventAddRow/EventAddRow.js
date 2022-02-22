@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-class EventAddRow extends React.Component {
-  render() {
-    const { newEvent, hanldeOnChange, hanldeSaveAddNew, handleClose } =
-      this.props;
+function EventAddRow(props){
+    const { newEvent, hanldeOnChange, hanldeSaveAddNew, handleClose } = props;
     return (
       <tr>
         <td>
@@ -36,7 +34,6 @@ class EventAddRow extends React.Component {
         </td>
       </tr>
     );
-  }
 }
 
 EventAddRow.propTypes = {

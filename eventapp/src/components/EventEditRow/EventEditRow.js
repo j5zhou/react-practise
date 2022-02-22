@@ -1,9 +1,8 @@
 import React from 'react';
 
-class EventEditRow extends React.Component {
-  render() {
-    const { event, hanldeOnChangeEdit, hanldeEditSave, hanldeCancel } =
-      this.props;
+function EventEditRow(props){
+
+    const { event, hanldeOnChangeEdit, hanldeEditSave, hanldeCancel } = props;
     return (
       <tr key={event.id}>
         <td>
@@ -37,6 +36,5 @@ class EventEditRow extends React.Component {
       </tr>
     );
   }
-}
 
 export default EventEditRow;

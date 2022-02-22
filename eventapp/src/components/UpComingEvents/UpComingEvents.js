@@ -1,21 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { withEventData } from '../../hoc/withEventData';
 
 import EventDataRow from '../EventDataRow/EventDataRow';
 import EventTable from '../EventTable/EventTable';
 import WithEventData from '../WithEventData/WithEventData';
-class UpComingEvent extends React.Component {
-  state = {
-    dataCol: ['Event Name', 'Start Date', 'End Date'],
-  };
-  renderHeader = () => {
+function UpComingEvent(props){
+  const [dataCol,setDataCol] = useState(['Event Name', 'Start Date', 'End Date']);
+  const renderHeader = () => {
     return <h5>UpComingEvent</h5>;
   };
-
-  render() {
-    const { events } = this.props;
+    const { events } = props;
     return (
-      <EventTable renderHeader={this.renderHeader} dataCol={this.state.dataCol}>
+      <EventTable renderHeader={renderHeader} dataCol={dataCol}>
         {events
           ?.filter((event) => {
             if (event.isInTheFuture()) {
@@ -29,7 +25,6 @@ class UpComingEvent extends React.Component {
           })}
       </EventTable>
     );
-  }
 }
 // HOC HELLO
 // const UpComingEventPage =withScanData(withError(withUser(withEventData(UpComingEvent))));
