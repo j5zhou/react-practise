@@ -31,4 +31,8 @@ export class EventData {
       +this.startDate < +this.endDate
     );
   }
+
+  isInTheFuture() {
+    return Date.now() < +convertDateValueToTimeStamp(this.startDate);
+  }
 }

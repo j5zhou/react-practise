@@ -1,5 +1,6 @@
 import React from 'react';
 import EventApp from './components/EventApp/EventApp';
+import UpComingEvent from './components/UpComingEvents/UpComingEvents';
 import './App.css';
 
 import Header from './components/Header/Header';
@@ -29,7 +30,7 @@ class App extends React.Component {
         curPage = <EventApp></EventApp>;
         break;
       case PAGESINFO.UpComingEvent:
-        curPage = <h1>TEST</h1>;
+        curPage = <UpComingEvent></UpComingEvent>;
         break;
       default:
     }

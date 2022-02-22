@@ -1,8 +1,24 @@
 const baseURL = 'http://localhost:3000';
 const path = 'events';
 
-export const getAllEvents = () =>
-  fetch([baseURL, path].join('/')).then((response) => response.json());
+export const getAllEvents = () => {
+  const controller = new AbortController();
+  const signal = controller.signal;
+  return {
+    controller,
+    fetchResult: fetch([baseURL, path].join('/'), {
+      method: 'GET',
+      signal,
+    }).then(
+      (response) =>
+        new Promise((res, rej) => {
+          setTimeout(() => {
+            res(response.json());
+          }, 3000);
+        })
+    ),
+  };
+};
 
 export const addNewEvent = (newEvent) =>
   fetch([baseURL, path].join('/'), {

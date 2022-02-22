@@ -1,5 +1,6 @@
 import React from 'react';
 import './Header.css';
+import EventCounter from '../EventCounter/EventCounter';
 export default class Header extends React.Component {
   hanldeNavClick = (e, pageInfo) => {
     e.preventDefault();
@@ -10,6 +11,8 @@ export default class Header extends React.Component {
     return (
       <header className="app-header">
         <nav className="app-header__nav">
+          <EventCounter></EventCounter>
+
           {Object.keys(pagesInfo).map((key) => (
             <a
               href={key}

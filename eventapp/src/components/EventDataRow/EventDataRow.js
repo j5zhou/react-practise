@@ -7,11 +7,7 @@ class EventDataRow extends React.Component {
   };
 
   render() {
-    const {
-      event,
-      handleOnchange,
-      actions: [actionOne, actionTwo],
-    } = this.props;
+    const { event, handleOnchange, actions } = this.props;
 
     return (
       <tr key={event.id}>
@@ -48,14 +44,20 @@ class EventDataRow extends React.Component {
             }
           />
         </td>
-        <td>
-          <Button onClick={() => actionOne.actionFn(event)}>
-            {actionOne.actionName}
-          </Button>
-          <Button onClick={() => actionTwo.actionFn(event)}>
-            {actionTwo.actionName}
-          </Button>
-        </td>
+        {actions ? (
+          <td>
+            {actions.map((action) => {
+              return (
+                <Button
+                  key={action.actionName}
+                  onClick={() => action.actionFn(event)}
+                >
+                  {action.actionName}
+                </Button>
+              );
+            })}
+          </td>
+        ) : null}
       </tr>
     );
   }

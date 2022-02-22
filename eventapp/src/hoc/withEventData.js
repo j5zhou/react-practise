@@ -24,8 +24,23 @@ export const withEventData = (WrappedComponent) => {
         event.id
       );
     };
+    componentWillUnmount() {
+      if (this.controllerList) {
+        this.controllerList.forEach((c) => {
+          console.log('cancelAPI call');
+          c.abort();
+        });
+      }
+    }
+    // API CALL
     fetchAllEvents = () => {
-      getAllEvents().then((data) => {
+      const { fetchResult, controller } = getAllEvents();
+      if (this.controllerList) {
+        this.controllerList.push(controller);
+      } else {
+        this.controllerList = [controller];
+      }
+      fetchResult.then((data) => {
         const events = data.map(({ eventName, startDate, endDate, id }) => {
           const newEvent = new EventData(eventName, startDate, endDate, id);
           this.generateEditEventstate(newEvent);
@@ -37,7 +52,7 @@ export const withEventData = (WrappedComponent) => {
         });
       });
     };
-
+    // API CALL
     handleUpdateEvent = (updateEvent) => {
       return editEvent(updateEvent).then((data) => {
         this.setState({
@@ -54,7 +69,7 @@ export const withEventData = (WrappedComponent) => {
         });
       });
     };
-
+    // API CALL
     handleDeleteEvent = (deletedEvent) => {
       return deleteEvent(deletedEvent).then((data) => {
         this.setState({
@@ -68,6 +83,7 @@ export const withEventData = (WrappedComponent) => {
         });
       });
     };
+    // API CALL
     handleAddEvent = (addEvent) => {
       return addNewEvent(addEvent).then(
         ({ eventName, startDate, endDate, id }) => {
@@ -79,7 +95,7 @@ export const withEventData = (WrappedComponent) => {
         }
       );
     };
-
+    // UI STATE
     handleSetEdit = (setEditEvent, isEdit) => {
       this.setState({
         events: this.state.events.map((event) => {
@@ -91,7 +107,7 @@ export const withEventData = (WrappedComponent) => {
         }),
       });
     };
-
+    // UI STATE
     handleOnChangeEditEvent = (editEvent) => {
       console.log(editEvent);
       this.setState({
@@ -108,27 +124,12 @@ export const withEventData = (WrappedComponent) => {
       });
     };
 
-    handleOnChangeEvent = (changeEvent) => {
-      this.setState({
-        events: this.state.events.map((event) => {
-          if (event.id === changeEvent.id) {
-            return {
-              ...changeEvent,
-            };
-          } else {
-            return event;
-          }
-        }),
-      });
-    };
-
     render() {
       const { events } = this.state;
       return (
         <WrappedComponent
           {...this.props}
           handleSetEdit={this.handleSetEdit}
-          handleOnChangeEvent={this.handleOnChangeEvent}
           handleOnChangeEditEvent={this.handleOnChangeEditEvent}
           handleAddEvent={this.handleAddEvent}
           handleDeleteEvent={this.handleDeleteEvent}

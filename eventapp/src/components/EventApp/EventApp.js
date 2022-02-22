@@ -3,10 +3,9 @@ import './EventApp.css';
 import { withEventData } from '../../hoc/withEventData';
 
 import { EventData } from '../../models/EventData';
-import EventEditRow from '../EventEditRow/EventEditRow';
-import EventRow from '../EventRow/EventRow';
-import EventAddRow from '../EventAddRow/EventAddRow';
+
 import EventDataRow from '../EventDataRow/EventDataRow';
+import EventTable from '../EventTable/EventTable';
 import Button from '../Button/Button';
 
 class EventApp extends React.Component {
@@ -55,7 +54,37 @@ class EventApp extends React.Component {
     });
   };
 
+  renderHeader = () => <Button onClick={this.hanldeAddEvent}>Add Event</Button>;
+  renderFooter = () => {
+    if (this.state.isShowAddEventRow) {
+      return (
+        <EventDataRow
+          event={this.state.newEvent}
+          actions={[
+            {
+              actionName: 'Save',
+              actionFn: this.hanldeSaveAddNew,
+            },
+            {
+              actionName: 'Close',
+              actionFn: this.handleCloseAddNew,
+            },
+          ]}
+          handleOnchange={this.hanldeOnChange}
+        ></EventDataRow>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  componentWillUnmount() {
+    console.log('EVENTAPP componentWillUnmount ');
+  }
+
   render() {
+    console.log('render Event App');
+
     const {
       events,
       handleOnChangeEditEvent,
@@ -63,74 +92,46 @@ class EventApp extends React.Component {
       handleSetEdit,
     } = this.props;
     return (
-      <section className="event-app">
-        <header className="event-app__header">
-          <Button onClick={this.hanldeAddEvent}>Add Event</Button>
-        </header>
-        <table className="event-app__table">
-          <thead>
-            <tr>
-              {this.state.dataCol?.map((col, index) => (
-                <th key={`${col}`}>{col}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {events?.map((event) =>
-              event.isEditing ? (
-                <EventDataRow
-                  key={event.id}
-                  event={event.editEvent}
-                  actions={[
-                    {
-                      actionName: 'Save',
-                      actionFn: this.handleEditSave,
-                    },
-                    {
-                      actionName: 'Cancel',
-                      actionFn: () => handleSetEdit(event, false),
-                    },
-                  ]}
-                  handleOnchange={handleOnChangeEditEvent}
-                ></EventDataRow>
-              ) : (
-                <EventDataRow
-                  key={event.id}
-                  event={event}
-                  actions={[
-                    {
-                      actionName: 'Edit',
-                      actionFn: () => handleSetEdit(event, true),
-                    },
-                    {
-                      actionName: 'Delete',
-                      actionFn: handleDeleteEvent,
-                    },
-                  ]}
-                ></EventDataRow>
-              )
-            )}
-          </tbody>
-          <tfoot>
-            {this.state.isShowAddEventRow ? (
-              <EventDataRow
-                event={this.state.newEvent}
-                actions={[
-                  {
-                    actionName: 'Save',
-                    actionFn: this.hanldeSaveAddNew,
-                  },
-                  {
-                    actionName: 'Close',
-                    actionFn: this.handleCloseAddNew,
-                  },
-                ]}
-                handleOnchange={this.hanldeOnChange}
-              ></EventDataRow>
-            ) : null}
-          </tfoot>
-        </table>
-      </section>
+      <EventTable
+        dataCol={this.state.dataCol}
+        renderFooter={this.renderFooter}
+        renderHeader={this.renderHeader}
+      >
+        {events?.map((event) =>
+          event.isEditing ? (
+            <EventDataRow
+              key={event.id}
+              event={event.editEvent}
+              actions={[
+                {
+                  actionName: 'Save',
+                  actionFn: this.handleEditSave,
+                },
+                {
+                  actionName: 'Cancel',
+                  actionFn: () => handleSetEdit(event, false),
+                },
+              ]}
+              handleOnchange={handleOnChangeEditEvent}
+            ></EventDataRow>
+          ) : (
+            <EventDataRow
+              key={event.id}
+              event={event}
+              actions={[
+                {
+                  actionName: 'Edit',
+                  actionFn: () => handleSetEdit(event, true),
+                },
+                {
+                  actionName: 'Delete',
+                  actionFn: handleDeleteEvent,
+                },
+              ]}
+            ></EventDataRow>
+          )
+        )}
+      </EventTable>
     );
   }
 }
