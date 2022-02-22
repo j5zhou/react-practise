@@ -14,8 +14,8 @@ export const addNewEvent = (newEvent) =>
     body: JSON.stringify(newEvent),
   }).then((response) => response.json());
 
-export const deleteEvent = (id) =>
-  fetch([baseURL, path, id].join('/'), {
+export const deleteEvent = (event) =>
+  fetch([baseURL, path, event.id].join('/'), {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',

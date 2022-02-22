@@ -1,11 +1,6 @@
 import React from 'react';
 import './EventApp.css';
-import {
-  getAllEvents,
-  addNewEvent,
-  deleteEvent,
-  editEvent,
-} from '../../services/event.api';
+import { withEventData } from '../../hoc/withEventData';
 
 import { EventData } from '../../models/EventData';
 import EventEditRow from '../EventEditRow/EventEditRow';
@@ -16,65 +11,25 @@ import Button from '../Button/Button';
 
 class EventApp extends React.Component {
   state = {
-    events: [],
     dataCol: ['Event Name', 'Start Date', 'End Date', 'Actions'],
     isShowAddEventRow: false,
     newEvent: new EventData('', '' + Date.now(), '' + Date.now()),
   };
-
-  generateEditEventstate = (event) => {
-    event.isEditing = false;
-    event.editEvent = new EventData(
-      event.eventName,
-      event.startDate,
-      event.endDate,
-      event.id
-    );
-  };
-
-  fetchAllEvents = () => {
-    getAllEvents().then((data) => {
-      const events = data.map(({ eventName, startDate, endDate, id }) => {
-        const newEvent = new EventData(eventName, startDate, endDate, id);
-        this.generateEditEventstate(newEvent);
-        return newEvent;
-      });
-
-      this.setState({
-        events,
-      });
-    });
-  };
-
-  componentDidMount() {
-    this.fetchAllEvents();
-  }
 
   hanldeAddEvent = () => {
     this.setState({
       isShowAddEventRow: true,
     });
   };
-  hanldeOnChange = ({ target: { name, value } }) => {
+  hanldeOnChange = (newEvent) => {
     this.setState({
       newEvent: {
-        ...this.state.newEvent,
-        [name]: value,
+        ...newEvent,
       },
     });
   };
 
-  hanldeDelete = (id) => {
-    deleteEvent(id)
-      .then(() => {
-        this.fetchAllEvents();
-      })
-      .catch((error) => {
-        console.warn(error);
-      });
-  };
-
-  handleClose = () => {
+  handleCloseAddNew = () => {
     this.setState({
       isShowAddEventRow: false,
       newEvent: new EventData('', '' + Date.now(), '' + Date.now()),
@@ -86,69 +41,27 @@ class EventApp extends React.Component {
     const newEvent = new EventData(eventName, startDate, endDate);
     newEvent.parseTimeStamp();
     if (newEvent.isValidForSave()) {
-      addNewEvent(newEvent).then((data) => {
-        //this.setState({ events: [data, ...this.state.events] });
-        this.fetchAllEvents();
+      this.props.handleAddEvent(newEvent).then((data) => {
+        this.handleCloseAddNew();
       });
-      this.handleClose();
     } else {
       alert('inValid');
     }
   };
-  hanldeEdit = ({ id }) => {
-    console.log('edit', id);
-    this.setState({
-      events: this.state.events.map((event) => {
-        if (event.id === id) {
-          return { ...event, isEditing: true };
-        } else {
-          return event;
-        }
-      }),
-    });
-  };
 
-  hanldeOnChangeEdit = ({ target: { name, value } }, { id }) => {
-    this.setState({
-      events: this.state.events.map((event) => {
-        if (event.id === id) {
-          return { ...event, editEvent: { ...event.editEvent, [name]: value } };
-        } else {
-          return event;
-        }
-      }),
-    });
-  };
-
-  hanldeCancel = (id) => {
-    this.setState({
-      events: this.state.events.map((event) => {
-        if (event.id === id) {
-          return { ...event, isEditing: false };
-        } else {
-          return event;
-        }
-      }),
-    });
-  };
-  hanldeEditSave = (editEventObj) => {
-    editEvent(editEventObj).then((data) => {
-      this.setState({
-        events: this.state.events.map((event) => {
-          if (event.id === editEventObj.id) {
-            return {
-              ...editEventObj,
-              isEditing: false,
-            };
-          } else {
-            return event;
-          }
-        }),
-      });
+  handleEditSave = (editEventObj) => {
+    this.props.handleUpdateEvent(editEventObj).then((data) => {
+      this.props.handleSetEdit(editEventObj, false);
     });
   };
 
   render() {
+    const {
+      events,
+      handleOnChangeEditEvent,
+      handleDeleteEvent,
+      handleSetEdit,
+    } = this.props;
     return (
       <section className="event-app">
         <header className="event-app__header">
@@ -163,7 +76,7 @@ class EventApp extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.events?.map((event) =>
+            {events?.map((event) =>
               event.isEditing ? (
                 <EventDataRow
                   key={event.id}
@@ -171,14 +84,14 @@ class EventApp extends React.Component {
                   actions={[
                     {
                       actionName: 'Save',
-                      actionFn: this.hanldeEditSave,
+                      actionFn: this.handleEditSave,
                     },
                     {
                       actionName: 'Cancel',
-                      actionFn: this.hanldeCancel,
+                      actionFn: () => handleSetEdit(event, false),
                     },
                   ]}
-                  handleOnchange={this.hanldeOnChangeEdit}
+                  handleOnchange={handleOnChangeEditEvent}
                 ></EventDataRow>
               ) : (
                 <EventDataRow
@@ -187,11 +100,11 @@ class EventApp extends React.Component {
                   actions={[
                     {
                       actionName: 'Edit',
-                      actionFn: this.hanldeEdit,
+                      actionFn: () => handleSetEdit(event, true),
                     },
                     {
                       actionName: 'Delete',
-                      actionFn: this.hanldeDelete,
+                      actionFn: handleDeleteEvent,
                     },
                   ]}
                 ></EventDataRow>
@@ -209,7 +122,7 @@ class EventApp extends React.Component {
                   },
                   {
                     actionName: 'Close',
-                    actionFn: this.handleClose,
+                    actionFn: this.handleCloseAddNew,
                   },
                 ]}
                 handleOnchange={this.hanldeOnChange}
@@ -222,4 +135,6 @@ class EventApp extends React.Component {
   }
 }
 
-export default EventApp;
+const EventManger = withEventData(EventApp);
+
+export default EventManger;
