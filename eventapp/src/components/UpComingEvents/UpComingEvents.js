@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { withEventData } from '../../hoc/withEventData';
+import useEventData from '../../hooks/useEventData';
 
 import EventDataRow from '../EventDataRow/EventDataRow';
 import EventTable from '../EventTable/EventTable';
@@ -9,7 +9,10 @@ function UpComingEvent(props){
   const renderHeader = () => {
     return <h5>UpComingEvent</h5>;
   };
-    const { events } = props;
+  const {
+    events
+  } = useEventData();
+
     return (
       <EventTable renderHeader={renderHeader} dataCol={dataCol}>
         {events
@@ -29,7 +32,7 @@ function UpComingEvent(props){
 // HOC HELLO
 // const UpComingEventPage =withScanData(withError(withUser(withEventData(UpComingEvent))));
 // const UpComingEventPage = withEventData(UpComingEvent);
-
+/*
 const UpComingEventPage = () => (
   <WithEventData
     renderChildren={(events) => {
@@ -37,5 +40,6 @@ const UpComingEventPage = () => (
     }}
   ></WithEventData>
 );
+*/
 
-export default UpComingEventPage;
+export default UpComingEvent;
